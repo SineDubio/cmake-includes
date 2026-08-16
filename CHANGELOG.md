@@ -1,3 +1,7 @@
+## 2026-08-16
+
+* Add PamplejuceFunctions.cmake: one include() that defines all pamplejuce_* functions and turns off their legacy include-time behavior
+
 ## 2025-12-26
 
 * PAMPLEJUCE_IPP will now be true on Linux and macOS Intel

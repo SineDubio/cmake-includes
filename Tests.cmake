@@ -85,7 +85,7 @@ function(pamplejuce_add_tests)
 
     # ${DISCOVERY_MODE} set to "PRE_TEST" for MacOS arm64 / Xcode development
     # fixes error when Xcode attempts to run test executable
-    catch_discover_tests(${PJ_TESTS_TARGET} ${DISCOVERY_MODE} "PRE_TEST")
+    catch_discover_tests(${PJ_TESTS_TARGET} DISCOVERY_MODE PRE_TEST)
 endfunction()
 
 # Legacy single-product consumers get today's exact behavior at include time.

@@ -4,7 +4,7 @@
 # after specific targets exist (PamplejuceIPP, GitHubENV).
 #
 # include() this after project(): Tests.cmake fetches Catch2 at include time.
-set(PAMPLEJUCE_MULTI_PRODUCT ON)
+set(_PAMPLEJUCE_USE_FUNCTIONS ON)
 
 include("${CMAKE_CURRENT_LIST_DIR}/SharedCodeDefaults.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/Assets.cmake")

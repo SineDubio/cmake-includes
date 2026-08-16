@@ -32,63 +32,63 @@ endif ()
 
 function(pamplejuce_add_tests)
     set(oneValueArgs TARGET DIRECTORY PLUGIN_TARGET SHARED_CODE SOURCE_INCLUDE_DIR)
-    cmake_parse_arguments(PJ_TESTS "" "${oneValueArgs}" "" ${ARGN})
+    cmake_parse_arguments(PAMP_TESTS "" "${oneValueArgs}" "" ${ARGN})
 
-    if (NOT PJ_TESTS_TARGET)
-        set(PJ_TESTS_TARGET Tests)
+    if (NOT PAMP_TESTS_TARGET)
+        set(PAMP_TESTS_TARGET Tests)
     endif ()
-    if (NOT PJ_TESTS_DIRECTORY)
-        set(PJ_TESTS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/tests")
+    if (NOT PAMP_TESTS_DIRECTORY)
+        set(PAMP_TESTS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/tests")
     endif ()
-    if (NOT PJ_TESTS_PLUGIN_TARGET)
-        set(PJ_TESTS_PLUGIN_TARGET "${PROJECT_NAME}")
+    if (NOT PAMP_TESTS_PLUGIN_TARGET)
+        set(PAMP_TESTS_PLUGIN_TARGET "${PROJECT_NAME}")
     endif ()
-    if (NOT PJ_TESTS_SHARED_CODE)
-        set(PJ_TESTS_SHARED_CODE SharedCode)
+    if (NOT PAMP_TESTS_SHARED_CODE)
+        set(PAMP_TESTS_SHARED_CODE SharedCode)
     endif ()
-    if (NOT PJ_TESTS_SOURCE_INCLUDE_DIR)
-        set(PJ_TESTS_SOURCE_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/source")
+    if (NOT PAMP_TESTS_SOURCE_INCLUDE_DIR)
+        set(PAMP_TESTS_SOURCE_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/source")
     endif ()
 
     # "GLOBS ARE BAD" is brittle and silly dev UX, sorry CMake!
-    file(GLOB_RECURSE TestFiles CONFIGURE_DEPENDS "${PJ_TESTS_DIRECTORY}/*.cpp" "${PJ_TESTS_DIRECTORY}/*.h")
+    file(GLOB_RECURSE TestFiles CONFIGURE_DEPENDS "${PAMP_TESTS_DIRECTORY}/*.cpp" "${PAMP_TESTS_DIRECTORY}/*.h")
 
     # Organize the test source in the Tests/ folder in Xcode
-    source_group(TREE ${PJ_TESTS_DIRECTORY} PREFIX "" FILES ${TestFiles})
+    source_group(TREE ${PAMP_TESTS_DIRECTORY} PREFIX "" FILES ${TestFiles})
 
     # Setup the test executable, again C++20 please
-    add_executable(${PJ_TESTS_TARGET} ${TestFiles})
-    target_compile_features(${PJ_TESTS_TARGET} PRIVATE cxx_std_20)
+    add_executable(${PAMP_TESTS_TARGET} ${TestFiles})
+    target_compile_features(${PAMP_TESTS_TARGET} PRIVATE cxx_std_20)
 
     # Our test executable also wants to know about our plugin code...
-    target_include_directories(${PJ_TESTS_TARGET} PRIVATE ${PJ_TESTS_SOURCE_INCLUDE_DIR})
+    target_include_directories(${PAMP_TESTS_TARGET} PRIVATE ${PAMP_TESTS_SOURCE_INCLUDE_DIR})
 
     # Copy over compile definitions from our plugin target so it has all the JUCEy goodness
-    target_compile_definitions(${PJ_TESTS_TARGET} PRIVATE $<TARGET_PROPERTY:${PJ_TESTS_PLUGIN_TARGET},COMPILE_DEFINITIONS>)
+    target_compile_definitions(${PAMP_TESTS_TARGET} PRIVATE $<TARGET_PROPERTY:${PAMP_TESTS_PLUGIN_TARGET},COMPILE_DEFINITIONS>)
 
     # And give tests access to our shared code
-    target_link_libraries(${PJ_TESTS_TARGET} PRIVATE ${PJ_TESTS_SHARED_CODE} Catch2::Catch2)
+    target_link_libraries(${PAMP_TESTS_TARGET} PRIVATE ${PAMP_TESTS_SHARED_CODE} Catch2::Catch2)
 
     # Make an Xcode Scheme for the test executable so we can run tests in the IDE
-    set_target_properties(${PJ_TESTS_TARGET} PROPERTIES XCODE_GENERATE_SCHEME ON)
+    set_target_properties(${PAMP_TESTS_TARGET} PROPERTIES XCODE_GENERATE_SCHEME ON)
 
     # When running Tests we have specific needs
-    target_compile_definitions(${PJ_TESTS_TARGET} PUBLIC
+    target_compile_definitions(${PAMP_TESTS_TARGET} PUBLIC
         JUCE_MODAL_LOOPS_PERMITTED=1 # let us run Message Manager in tests
         RUN_PAMPLEJUCE_TESTS=1 # also run tests in other module .cpp files guarded by RUN_PAMPLEJUCE_TESTS
     )
 
     # Let our tests target know we are running in CI
     if ((DEFINED ENV{CI}))
-        target_compile_definitions(${PJ_TESTS_TARGET} PUBLIC CI=1)
+        target_compile_definitions(${PAMP_TESTS_TARGET} PUBLIC CI=1)
     endif ()
 
     # ${DISCOVERY_MODE} set to "PRE_TEST" for MacOS arm64 / Xcode development
     # fixes error when Xcode attempts to run test executable
-    catch_discover_tests(${PJ_TESTS_TARGET} DISCOVERY_MODE PRE_TEST)
+    catch_discover_tests(${PAMP_TESTS_TARGET} DISCOVERY_MODE PRE_TEST)
 endfunction()
 
 # Legacy single-product consumers get today's exact behavior at include time.
-if (NOT PAMPLEJUCE_MULTI_PRODUCT)
+if (NOT _PAMPLEJUCE_USE_FUNCTIONS AND NOT PAMPLEJUCE_MULTI_PRODUCT)
     pamplejuce_add_tests()
 endif ()

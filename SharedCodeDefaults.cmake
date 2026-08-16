@@ -29,6 +29,6 @@ function(pamplejuce_shared_code_defaults)
 endfunction()
 
 # Legacy single-product consumers get today's exact behavior at include time.
-if (NOT _PAMPLEJUCE_USE_FUNCTIONS AND NOT PAMPLEJUCE_MULTI_PRODUCT)
+if (NOT _PAMPLEJUCE_USE_FUNCTIONS)
     pamplejuce_shared_code_defaults()
 endif ()

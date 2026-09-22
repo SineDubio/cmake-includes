@@ -1,6 +1,6 @@
 # When present, use Intel IPP for performance on Windows, Linux, and macOS (x86_64 only)
 if(WIN32)
-    set(IPP_ROOT "$ENV{USERPROFILE}/.nuget/packages/intelipp.static.win-x64/2022.3.0.387")
+    set(IPP_ROOT "$ENV{USERPROFILE}/.nuget/packages/intelipp.static.win-x64/2026.0.0.712")
     set(IPP_INC "${IPP_ROOT}/build/native/include/ipp")
     set(IPP_LIB "${IPP_ROOT}/build/native/win-x64/")
     set(IPP_LIBS ippsmt ippcoremt ippimt ippcvmt ippvmmt)
@@ -31,14 +31,26 @@ elseif(UNIX)
     # Installed via intel-oneapi-ipp-devel package
     set(IPP_ROOT "/opt/intel/oneapi/ipp/latest")
     set(IPP_INC "${IPP_ROOT}/include")
+    # IPP 2026+ nests headers under include/ipp/
+    if(IS_DIRECTORY "${IPP_ROOT}/include/ipp")
+        list(APPEND IPP_INC "${IPP_ROOT}/include/ipp")
+    endif()
     set(IPP_LIB "${IPP_ROOT}/lib")
-    set(IPP_LIBS ipps ippcore ippi ippcv ippvm)
+    # Static link so end users don't need IPP installed
+    set(IPP_LIBS
+        "${IPP_LIB}/libipps.a"
+        "${IPP_LIB}/libippi.a"
+        "${IPP_LIB}/libippcv.a"
+        "${IPP_LIB}/libippvm.a"
+        "${IPP_LIB}/libippcore.a"
+    )
+    set(IPP_LINUX_STATIC TRUE)
 endif()
 
 if (DEFINED IPP_ROOT)
     if (IS_DIRECTORY "${IPP_ROOT}")
         message(STATUS "INTEL IPP FOUND at ${IPP_ROOT}")
-        target_include_directories(SharedCode INTERFACE "${IPP_INC}")
+        target_include_directories(SharedCode INTERFACE ${IPP_INC})
 
         if (IPP_MACOS)
             # For universal builds, use -Xarch_x86_64 to apply IPP flags only to x86_64 slice
@@ -50,6 +62,9 @@ if (DEFINED IPP_ROOT)
             target_link_options(SharedCode INTERFACE
                 "SHELL:-Xarch_x86_64 -Wl,-L${IPP_LIB},-lipps,-lippi,-lippcv,-lippvm,-lippcore"
             )
+        elseif(IPP_LINUX_STATIC)
+            target_link_libraries(SharedCode INTERFACE ${IPP_LIBS})
+            target_compile_definitions(SharedCode INTERFACE PAMPLEJUCE_IPP=1)
         else()
             target_link_directories(SharedCode INTERFACE "${IPP_LIB}")
             target_link_libraries(SharedCode INTERFACE ${IPP_LIBS})

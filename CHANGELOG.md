@@ -1,3 +1,10 @@
+## 2026-08-16
+
+* Add PamplejuceFunctions.cmake: one include() that defines all pamplejuce_* functions and turns off their legacy include-time behavior
+* Fix catch_discover_tests call so DISCOVERY_MODE PRE_TEST actually applies (was silently falling back to POST_BUILD)
+* Rename the internal flag to _PAMPLEJUCE_USE_FUNCTIONS (PAMPLEJUCE_MULTI_PRODUCT is gone: include PamplejuceFunctions.cmake instead of setting a flag)
+* Rename function argument prefixes from PJ_ to PAMP_ (internal only, no API change)
+
 ## 2025-12-26
 
 * PAMPLEJUCE_IPP will now be true on Linux and macOS Intel

@@ -1,5 +1,5 @@
-option(WITH_ADDRESS_SANITIZER "Enable Address Sanitizer" OFF)
-option(WITH_THREAD_SANITIZER "Enable Thread Sanitizer" OFF)
+option(WITH_ADDRESS_SANITIZER "Enable Address Sanitizer" ON)
+option(WITH_THREAD_SANITIZER "Enable Thread Sanitizer" ON)
 
 message(STATUS "Sanitizers: ASan=${WITH_ADDRESS_SANITIZER} TSan=${WITH_THREAD_SANITIZER}")
 if (WITH_ADDRESS_SANITIZER)

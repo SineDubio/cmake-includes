@@ -3,7 +3,6 @@
 # This exposes CURRENT_VERSION to the build system
 # And it's later fed to JUCE so it shows up as VERSION in your IDE
 
-
 # This will automate the patch level bumping
 option(PAMPLEJUCE_AUTO_BUMP_PATCH_LEVEL "Auto bump patch level based on commit count" OFF)
 
